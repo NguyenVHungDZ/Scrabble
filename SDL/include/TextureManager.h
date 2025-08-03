@@ -7,7 +7,7 @@
 // Forward declarations
 struct SDL_Renderer;
 struct SDL_Texture;
-typedef struct TTF_Font TTF_Font; // Corrected forward declaration
+typedef struct TTF_Font TTF_Font;
 
 class TextureManager {
 public:

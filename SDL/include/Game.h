@@ -7,7 +7,7 @@
 // Forward declarations
 struct SDL_Window;
 struct SDL_Renderer;
-typedef struct TTF_Font TTF_Font; // Corrected forward declaration
+typedef struct TTF_Font TTF_Font;
 class Board;
 class Player;
 class Tile;
@@ -26,6 +26,7 @@ private:
     void cleanup();
     void submitWord();
     void recallAllTiles();
+    void resetLetters(); // NEW: Action for the reset button
     void renderUI();
     bool isRunning;
     SDL_Window* window;
@@ -38,7 +39,8 @@ private:
     Dictionary* dictionary;
     Tile* selectedTile;
     int mouseX, mouseY;
-    SDL_Rect submitButtonRect; // Now has a complete type
-    SDL_Rect recallButtonRect; // Now has a complete type
+    SDL_Rect submitButtonRect; 
+    SDL_Rect recallButtonRect;
+    SDL_Rect resetButtonRect; // NEW: Rect for the reset button
 };
 #endif // GAME_H

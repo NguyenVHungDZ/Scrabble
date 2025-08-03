@@ -20,7 +20,6 @@ Dictionary::Dictionary(const std::string& path) {
     }
     std::cout << "SUCCESS: Dictionary loaded with " << wordList.size() << " words." << std::endl;
 }
-
 bool Dictionary::isValidWord(const std::string& word) const {
     return wordList.count(word) > 0;
 }

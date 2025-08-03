@@ -18,19 +18,16 @@ Tile::Tile(char letter, int value, SDL_Renderer* renderer, TTF_Font* font, TTF_F
     std::string valueStr = std::to_string(value);
     valueTexture = TextureManager::LoadText(renderer, smallFont, valueStr, COLOR_TEXT);
 }
-
 Tile::~Tile() {
     if (letterTexture) SDL_DestroyTexture(letterTexture);
     if (valueTexture) SDL_DestroyTexture(valueTexture);
 }
-
 void Tile::render(int x, int y) {
     SDL_Rect tileRect = {x, y, TILE_SIZE, TILE_SIZE};
     SDL_SetRenderDrawColor(renderer, COLOR_TILE_NORMAL.r, COLOR_TILE_NORMAL.g, COLOR_TILE_NORMAL.b, COLOR_TILE_NORMAL.a);
     SDL_RenderFillRect(renderer, &tileRect);
     SDL_SetRenderDrawColor(renderer, COLOR_TILE_BORDER.r, COLOR_TILE_BORDER.g, COLOR_TILE_BORDER.b, COLOR_TILE_BORDER.a);
     SDL_RenderDrawRect(renderer, &tileRect);
-
     if (letterTexture) {
         int w, h;
         SDL_QueryTexture(letterTexture, NULL, NULL, &w, &h);

@@ -11,9 +11,7 @@ Board::Board(SDL_Renderer* renderer) : renderer(renderer) {
     tileGrid.resize(BOARD_DIMENSION, std::vector<Tile*>(BOARD_DIMENSION, nullptr));
     initializeBonusSquares();
 }
-
 Board::~Board() {}
-
 void Board::render() {
      for (int row = 0; row < BOARD_DIMENSION; ++row) {
         for (int col = 0; col < BOARD_DIMENSION; ++col) {
@@ -27,7 +25,6 @@ void Board::render() {
         }
     }
 }
-
 void Board::placeTemporaryTile(Tile* tile, int row, int col) {
     if (row < 0 || row >= BOARD_DIMENSION || col < 0 || col >= BOARD_DIMENSION || isOccupied(row, col)) return;
     if(tile->boardRow != -1) {
@@ -41,12 +38,10 @@ void Board::placeTemporaryTile(Tile* tile, int row, int col) {
         tempPlacedTiles.push_back(tile);
     }
 }
-
 bool Board::isOccupied(int row, int col) {
     if (row < 0 || row >= BOARD_DIMENSION || col < 0 || col >= BOARD_DIMENSION) return true;
     return tileGrid[row][col] != nullptr;
 }
-
 WordPlacement Board::getPlacedWord() {
     WordPlacement result;
     if (tempPlacedTiles.empty()) return result;
@@ -66,7 +61,6 @@ WordPlacement Board::getPlacedWord() {
     result.isValid = true;
     return result;
 }
-
 void Board::recallTiles(std::vector<Tile*>& playerRack) {
     for (Tile* tile : tempPlacedTiles) {
         tileGrid[tile->boardRow][tile->boardCol] = nullptr;
@@ -76,9 +70,7 @@ void Board::recallTiles(std::vector<Tile*>& playerRack) {
     }
     tempPlacedTiles.clear();
 }
-
 void Board::finalizeTurn() { tempPlacedTiles.clear(); }
-
 int Board::calculateScore(const WordPlacement& placement) {
     int totalScore = 0, wordMultiplier = 1;
     for(Tile* tile : placement.tiles) {
@@ -95,7 +87,6 @@ int Board::calculateScore(const WordPlacement& placement) {
     }
     return totalScore * wordMultiplier;
 }
-
 void Board::initializeBonusSquares() {
     bonusGrid[0][0] = bonusGrid[0][7] = bonusGrid[0][14] = TRIPLE_WORD;
     bonusGrid[7][0] = bonusGrid[7][14] = TRIPLE_WORD;
@@ -119,7 +110,6 @@ void Board::initializeBonusSquares() {
     bonusGrid[12][6] = bonusGrid[12][8] = DOUBLE_LETTER;
     bonusGrid[14][3] = bonusGrid[14][11] = DOUBLE_LETTER;
 }
-
 void Board::renderBonusSquare(int row, int col) {
     if (tileGrid[row][col] != nullptr) return;
     SDL_Rect squareRect = { BOARD_X_OFFSET + col * TILE_SIZE, BOARD_Y_OFFSET + row * TILE_SIZE, TILE_SIZE, TILE_SIZE };

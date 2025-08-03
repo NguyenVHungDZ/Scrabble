@@ -15,7 +15,7 @@ const int BOARD_X_OFFSET = (SCREEN_WIDTH - BOARD_SIZE_PX) / 2;
 const int BOARD_Y_OFFSET = 20;
 const int RACK_HEIGHT = 80;
 const int RACK_Y_POS = SCREEN_HEIGHT - RACK_HEIGHT - 80;
-const int PLAYER_RACK_SIZE = 7;
+const int PLAYER_RACK_SIZE = 8; 
 const int UI_AREA_Y = RACK_Y_POS + RACK_HEIGHT + 10;
 
 // --- A generic color struct since SDL_Color is no longer in headers ---
