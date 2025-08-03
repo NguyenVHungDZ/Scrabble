@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build SDL",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-Isrc",
+        "-ISDL/include",
+        "src/*.cpp",
+        "-LSDL/lib",
+        "-lmingw32", "-lSDL2main", "-lSDL2",
+        "-lSDL2_image", "-lSDL2_ttf",
+        "-o", "main.exe"
+      ],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    }
+  ]
+}
