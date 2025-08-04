@@ -39,7 +39,6 @@ void Player::resetRack() {
     // Return all current tiles to the bag
     for (size_t i = 0; i < rack.size(); ++i) {
         if (rack[i] != nullptr) {
-            // Only add back letters, not blank tiles if they have a special value
             if (rack[i]->getLetter() != ' ') {
                  tileBag.push_back(rack[i]->getLetter());
             }

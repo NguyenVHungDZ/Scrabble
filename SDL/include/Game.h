@@ -2,7 +2,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL_rect.h> // Include the definition for SDL_Rect
+#include <SDL_rect.h> 
 
 // Forward declarations
 struct SDL_Window;
@@ -12,6 +12,11 @@ class Board;
 class Player;
 class Tile;
 class Dictionary;
+
+enum GameState {
+    PLAYING,
+    GAME_OVER
+};
 
 class Game {
 public:
@@ -26,21 +31,34 @@ private:
     void cleanup();
     void submitWord();
     void recallAllTiles();
-    void resetLetters(); // NEW: Action for the reset button
+    void resetLetters(); 
     void renderUI();
+    void loadHighScore();
+    void saveHighScore();
+    void startOver();
+    void renderGameOver();
+
     bool isRunning;
+    GameState currentState; 
+    int highScore; 
+
     SDL_Window* window;
     SDL_Renderer* renderer;
     TTF_Font* mainFont;
     TTF_Font* smallFont;
     TTF_Font* uiFont;
+    TTF_Font* gameOverFont; 
+
     Board* board;
     Player* player;
     Dictionary* dictionary;
     Tile* selectedTile;
     int mouseX, mouseY;
+
+    // UI elements
     SDL_Rect submitButtonRect; 
     SDL_Rect recallButtonRect;
-    SDL_Rect resetButtonRect; // NEW: Rect for the reset button
+    SDL_Rect resetButtonRect;
+    SDL_Rect startOverButtonRect; 
 };
 #endif // GAME_H

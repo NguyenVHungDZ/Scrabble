@@ -3,7 +3,7 @@
 #define TILE_H
 #include <string>
 
-// Forward declarations instead of including SDL headers
+// Forward declarations
 struct SDL_Renderer;
 struct SDL_Texture;
 typedef struct TTF_Font TTF_Font;

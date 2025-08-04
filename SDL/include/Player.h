@@ -16,7 +16,7 @@ public:
     ~Player();
     void renderRack();
     void refillRack();
-    void resetRack(); // NEW: Function to reset letters
+    void resetRack(); 
     
     std::vector<Tile*>& getRack() { return rack; }
     Tile* getTileFromRack(int index);
@@ -25,7 +25,7 @@ public:
     
     int getScore() const { return score; }
     void addScore(int points) { score += points; }
-    int getLives() const { return lives; } // NEW: Getter for lives
+    int getLives() const { return lives; } 
 
 private:
     void initializeTileBag();
@@ -33,7 +33,7 @@ private:
     TTF_Font* font;
     TTF_Font* smallFont;
     int score;
-    int lives; // NEW: Player lives
+    int lives; 
     std::vector<Tile*> rack;
     std::vector<char> tileBag;
     std::map<char, int> tileValues;

@@ -18,7 +18,6 @@ Dictionary::Dictionary(const std::string& path) {
                        [](unsigned char c){ return std::toupper(c); });
         wordList.insert(word);
     }
-    std::cout << "SUCCESS: Dictionary loaded with " << wordList.size() << " words." << std::endl;
 }
 bool Dictionary::isValidWord(const std::string& word) const {
     return wordList.count(word) > 0;
