@@ -20,20 +20,25 @@ const int UI_PANEL_X = BOARD_X_OFFSET + BOARD_SIZE_PX + 40; // UI starts to the 
 
 // --- A generic color struct since SDL_Color is no longer in headers ---
 struct Color { uint8_t r, g, b, a; };
-const Color COLOR_BOARD_BG = {0, 70, 70, 255};
-const Color COLOR_TILE_NORMAL = {245, 245, 220, 255};
-const Color COLOR_TILE_BORDER = {210, 180, 140, 255};
-const Color COLOR_RACK_BG = {139, 69, 19, 255};
-const Color COLOR_TEXT = {0, 0, 0, 255};
-const Color COLOR_BUTTON = {70, 130, 180, 255};
-const Color COLOR_BUTTON_TEXT = {255, 255, 255, 255};
-const Color COLOR_GAMEOVER_BG = {0, 0, 0, 200}; 
-const Color COLOR_GAMEOVER_DIALOG = {40, 40, 60, 255}; 
-const Color COLOR_DBL_LETTER = {173, 216, 230, 255};
-const Color COLOR_TRP_LETTER = {0, 0, 139, 255};
-const Color COLOR_DBL_WORD = {255, 182, 193, 255};
-const Color COLOR_TRP_WORD = {255, 0, 0, 255};
-const Color COLOR_CENTER_STAR = {255, 215, 0, 255};
+
+// --- NEW MODERN COLOR PALETTE ---
+const Color COLOR_BACKGROUND = { 44, 62, 80, 255 };      // Dark Slate
+const Color COLOR_UI_PANEL = { 52, 73, 94, 255 };        // Lighter Slate
+const Color COLOR_TILE_NORMAL = { 241, 196, 15, 255 };     // Sunflower Yellow
+const Color COLOR_TILE_SHADOW = { 192, 57, 43, 255 };      // Dark Orange/Red for shadow
+const Color COLOR_TEXT_LIGHT = { 236, 240, 241, 255 };    // Off-White
+const Color COLOR_TEXT_DARK = { 44, 62, 80, 255 };         // Dark Slate for on-tile text
+const Color COLOR_BUTTON = { 26, 188, 156, 255 };         // Teal
+const Color COLOR_BUTTON_HOVER = { 22, 160, 133, 255 };    // Darker Teal
+const Color COLOR_BUTTON_SHADOW = { 19, 118, 99, 255 };     // Even Darker Teal
+const Color COLOR_RACK_BG = { 44, 62, 80, 255 };          // Same as background for seamless look
+const Color COLOR_GAMEOVER_BG = { 0, 0, 0, 220 }; 
+const Color COLOR_GAMEOVER_DIALOG = { 52, 73, 94, 255 }; 
+const Color COLOR_DBL_LETTER = { 52, 152, 219, 255 };     // Peter River Blue
+const Color COLOR_TRP_LETTER = { 41, 128, 185, 255 };     // Belize Hole Blue
+const Color COLOR_DBL_WORD = { 155, 89, 182, 255 };      // Amethyst Purple
+const Color COLOR_TRP_WORD = { 142, 68, 173, 255 };      // Wisteria Purple
+const Color COLOR_CENTER_STAR = { 243, 156, 18, 255 };    // Orange
 
 // --- Game Data ---
 const std::string FONT_PATH = "assets/arial.ttf";

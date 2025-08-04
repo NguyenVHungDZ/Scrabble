@@ -9,7 +9,7 @@
 #include <iostream>
 
 Player::Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont) 
-    : renderer(renderer), font(font), smallFont(smallFont), score(0), lives(3) { // Set initial lives
+    : renderer(renderer), font(font), smallFont(smallFont), score(0), lives(3) { 
     initializeTileBag();
     rack.resize(PLAYER_RACK_SIZE, nullptr);
     refillRack();
@@ -33,10 +33,7 @@ void Player::refillRack() {
 
 void Player::resetRack() {
     if (lives <= 0) return; 
-
     lives--; 
-
-    // Return all current tiles to the bag
     for (size_t i = 0; i < rack.size(); ++i) {
         if (rack[i] != nullptr) {
             if (rack[i]->getLetter() != ' ') {
@@ -46,12 +43,9 @@ void Player::resetRack() {
             rack[i] = nullptr;
         }
     }
-
-    // Shuffle the bag and refill the rack
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(tileBag.begin(), tileBag.end(), g);
-    
     refillRack();
 }
 

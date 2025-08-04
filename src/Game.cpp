@@ -41,7 +41,6 @@ bool Game::init() {
     board = new Board(renderer);
     player = new Player(renderer, mainFont, smallFont);
     
-    // Define UI button rectangles in the new side panel
     submitButtonRect = { UI_PANEL_X, 40, 220, 50 };
     recallButtonRect = { UI_PANEL_X, 110, 220, 50 };
     resetButtonRect = { UI_PANEL_X, 180, 220, 50 }; 
@@ -182,7 +181,7 @@ void Game::saveHighScore() {
 void Game::update() {}
 
 void Game::render() {
-    SDL_SetRenderDrawColor(renderer, COLOR_BOARD_BG.r, COLOR_BOARD_BG.g, COLOR_BOARD_BG.b, COLOR_BOARD_BG.a);
+    SDL_SetRenderDrawColor(renderer, COLOR_BACKGROUND.r, COLOR_BACKGROUND.g, COLOR_BACKGROUND.b, COLOR_BACKGROUND.a);
     SDL_RenderClear(renderer);
     board->render();
     player->renderRack();
@@ -197,55 +196,60 @@ void Game::render() {
 }
 
 void Game::renderUI() {
-    // --- Draw Button Backgrounds ---
-    SDL_SetRenderDrawColor(renderer, COLOR_BUTTON.r, COLOR_BUTTON.g, COLOR_BUTTON.b, COLOR_BUTTON.a);
-    SDL_RenderFillRect(renderer, &submitButtonRect);
-    SDL_RenderFillRect(renderer, &recallButtonRect);
-    SDL_RenderFillRect(renderer, &resetButtonRect);
+    // --- Draw UI Panel Background ---
+    SDL_Rect uiPanelRect = { UI_PANEL_X - 20, 0, SCREEN_WIDTH - (UI_PANEL_X - 20), SCREEN_HEIGHT };
+    SDL_SetRenderDrawColor(renderer, COLOR_UI_PANEL.r, COLOR_UI_PANEL.g, COLOR_UI_PANEL.b, COLOR_UI_PANEL.a);
+    SDL_RenderFillRect(renderer, &uiPanelRect);
 
-    // --- Draw Button Text ---
-    SDL_Texture* submitTexture = TextureManager::LoadText(renderer, uiFont, "Submit Word", COLOR_BUTTON_TEXT);
-    if (submitTexture) {
-        int w, h; SDL_QueryTexture(submitTexture, NULL, NULL, &w, &h);
-        SDL_Rect dest = { submitButtonRect.x + (submitButtonRect.w - w) / 2, submitButtonRect.y + (submitButtonRect.h - h) / 2, w, h };
-        SDL_RenderCopy(renderer, submitTexture, NULL, &dest);
-        SDL_DestroyTexture(submitTexture);
-    }
-    SDL_Texture* recallTexture = TextureManager::LoadText(renderer, uiFont, "Recall Tiles", COLOR_BUTTON_TEXT);
-    if (recallTexture) {
-        int w, h; SDL_QueryTexture(recallTexture, NULL, NULL, &w, &h);
-        SDL_Rect dest = { recallButtonRect.x + (recallButtonRect.w - w) / 2, recallButtonRect.y + (recallButtonRect.h - h) / 2, w, h };
-        SDL_RenderCopy(renderer, recallTexture, NULL, &dest);
-        SDL_DestroyTexture(recallTexture);
-    }
-    SDL_Texture* resetTexture = TextureManager::LoadText(renderer, uiFont, "Reset Letters", COLOR_BUTTON_TEXT);
-    if (resetTexture) {
-        int w, h; SDL_QueryTexture(resetTexture, NULL, NULL, &w, &h);
-        SDL_Rect dest = { resetButtonRect.x + (resetButtonRect.w - w) / 2, resetButtonRect.y + (resetButtonRect.h - h) / 2, w, h };
-        SDL_RenderCopy(renderer, resetTexture, NULL, &dest);
-        SDL_DestroyTexture(resetTexture);
-    }
+    // --- Helper lambda for drawing buttons with shadows and hover ---
+    auto drawButton = [&](const SDL_Rect& rect, const std::string& text) {
+        bool isHovered = (mouseX >= rect.x && mouseX < rect.x + rect.w && mouseY >= rect.y && mouseY < rect.y + rect.h);
+        const Color& bgColor = isHovered ? COLOR_BUTTON_HOVER : COLOR_BUTTON;
+
+        // Draw shadow
+        SDL_Rect shadowRect = { rect.x + 3, rect.y + 3, rect.w, rect.h };
+        SDL_SetRenderDrawColor(renderer, COLOR_BUTTON_SHADOW.r, COLOR_BUTTON_SHADOW.g, COLOR_BUTTON_SHADOW.b, COLOR_BUTTON_SHADOW.a);
+        SDL_RenderFillRect(renderer, &shadowRect);
+
+        // Draw main button
+        SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+        SDL_RenderFillRect(renderer, &rect);
+
+        // Draw text
+        SDL_Texture* textTexture = TextureManager::LoadText(renderer, uiFont, text, COLOR_TEXT_LIGHT);
+        if (textTexture) {
+            int w, h; SDL_QueryTexture(textTexture, NULL, NULL, &w, &h);
+            SDL_Rect dest = { rect.x + (rect.w - w) / 2, rect.y + (rect.h - h) / 2, w, h };
+            SDL_RenderCopy(renderer, textTexture, NULL, &dest);
+            SDL_DestroyTexture(textTexture);
+        }
+    };
+
+    // --- Draw all buttons ---
+    drawButton(submitButtonRect, "Submit Word");
+    drawButton(recallButtonRect, "Recall Tiles");
+    drawButton(resetButtonRect, "Reset Letters");
 
     // --- Draw Score Info Text ---
     std::string highScoreText = "High Score: " + std::to_string(highScore);
     std::string scoreText = "Current Score: " + std::to_string(player->getScore());
     std::string livesText = "Resets Left: " + std::to_string(player->getLives());
 
-    SDL_Texture* highScoreTexture = TextureManager::LoadText(renderer, uiFont, highScoreText, COLOR_BUTTON_TEXT);
+    SDL_Texture* highScoreTexture = TextureManager::LoadText(renderer, uiFont, highScoreText, COLOR_TEXT_LIGHT);
     if(highScoreTexture) {
         int w, h; SDL_QueryTexture(highScoreTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { UI_PANEL_X, 300, w, h};
         SDL_RenderCopy(renderer, highScoreTexture, NULL, &dest);
         SDL_DestroyTexture(highScoreTexture);
     }
-    SDL_Texture* scoreTexture = TextureManager::LoadText(renderer, uiFont, scoreText, COLOR_BUTTON_TEXT);
+    SDL_Texture* scoreTexture = TextureManager::LoadText(renderer, uiFont, scoreText, COLOR_TEXT_LIGHT);
     if(scoreTexture) {
         int w, h; SDL_QueryTexture(scoreTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { UI_PANEL_X, 340, w, h};
         SDL_RenderCopy(renderer, scoreTexture, NULL, &dest);
         SDL_DestroyTexture(scoreTexture);
     }
-    SDL_Texture* livesTexture = TextureManager::LoadText(renderer, uiFont, livesText, COLOR_BUTTON_TEXT);
+    SDL_Texture* livesTexture = TextureManager::LoadText(renderer, uiFont, livesText, COLOR_TEXT_LIGHT);
     if(livesTexture) {
         int w, h; SDL_QueryTexture(livesTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { UI_PANEL_X, 380, w, h};
@@ -261,7 +265,7 @@ void Game::renderGameOver() {
     SDL_Rect dialog = {SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2 - 150, 400, 300};
     SDL_SetRenderDrawColor(renderer, COLOR_GAMEOVER_DIALOG.r, COLOR_GAMEOVER_DIALOG.g, COLOR_GAMEOVER_DIALOG.b, COLOR_GAMEOVER_DIALOG.a);
     SDL_RenderFillRect(renderer, &dialog);
-    SDL_Texture* goTexture = TextureManager::LoadText(renderer, gameOverFont, "Game Over", COLOR_BUTTON_TEXT);
+    SDL_Texture* goTexture = TextureManager::LoadText(renderer, gameOverFont, "Game Over", COLOR_TEXT_LIGHT);
     if (goTexture) {
         int w, h; SDL_QueryTexture(goTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { SCREEN_WIDTH / 2 - w / 2, dialog.y + 30, w, h };
@@ -269,16 +273,20 @@ void Game::renderGameOver() {
         SDL_DestroyTexture(goTexture);
     }
     std::string finalScoreText = "Final Score: " + std::to_string(player->getScore());
-    SDL_Texture* scoreTexture = TextureManager::LoadText(renderer, uiFont, finalScoreText, COLOR_BUTTON_TEXT);
+    SDL_Texture* scoreTexture = TextureManager::LoadText(renderer, uiFont, finalScoreText, COLOR_TEXT_LIGHT);
     if (scoreTexture) {
         int w, h; SDL_QueryTexture(scoreTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { SCREEN_WIDTH / 2 - w / 2, dialog.y + 120, w, h };
         SDL_RenderCopy(renderer, scoreTexture, NULL, &dest);
         SDL_DestroyTexture(scoreTexture);
     }
-    SDL_SetRenderDrawColor(renderer, COLOR_BUTTON.r, COLOR_BUTTON.g, COLOR_BUTTON.b, COLOR_BUTTON.a);
+    
+    // Draw Start Over button with hover effect
+    bool isHovered = (mouseX >= startOverButtonRect.x && mouseX < startOverButtonRect.x + startOverButtonRect.w && mouseY >= startOverButtonRect.y && mouseY < startOverButtonRect.y + startOverButtonRect.h);
+    const Color& bgColor = isHovered ? COLOR_BUTTON_HOVER : COLOR_BUTTON;
+    SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
     SDL_RenderFillRect(renderer, &startOverButtonRect);
-    SDL_Texture* buttonTexture = TextureManager::LoadText(renderer, uiFont, "Start Over", COLOR_BUTTON_TEXT);
+    SDL_Texture* buttonTexture = TextureManager::LoadText(renderer, uiFont, "Start Over", COLOR_TEXT_LIGHT);
     if (buttonTexture) {
         int w, h; SDL_QueryTexture(buttonTexture, NULL, NULL, &w, &h);
         SDL_Rect dest = { startOverButtonRect.x + (startOverButtonRect.w - w) / 2, startOverButtonRect.y + (startOverButtonRect.h - h) / 2, w, h };
