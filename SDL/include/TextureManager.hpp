@@ -2,7 +2,7 @@
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
 #include <string>
-#include "Constants.h" 
+#include "Constants.hpp" 
 
 // Forward declarations
 struct SDL_Renderer;

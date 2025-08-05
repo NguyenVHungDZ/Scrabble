@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Tile.h"
+#include "Tile.hpp"
 
 // Forward declarations
 struct SDL_Renderer;

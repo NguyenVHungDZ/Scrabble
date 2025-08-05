@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include "TextureManager.h"
+#include "TextureManager.hpp"
 #include <iostream>
 
 SDL_Texture* TextureManager::LoadText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, Color color) {

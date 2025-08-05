@@ -2,8 +2,8 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "Player.h"
-#include "Constants.h"
+#include "Player.hpp"
+#include "Constants.hpp"
 #include <random>
 #include <algorithm>
 #include <iostream>

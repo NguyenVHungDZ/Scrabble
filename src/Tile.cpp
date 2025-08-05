@@ -2,9 +2,9 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "Tile.h"
-#include "Constants.h"
-#include "TextureManager.h"
+#include "Tile.hpp"
+#include "Constants.hpp"
+#include "TextureManager.hpp"
 #include <string>
 
 Tile::Tile(char letter, int value, SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont)

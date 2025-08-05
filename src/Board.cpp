@@ -1,8 +1,8 @@
 // -- src/Board.cpp --
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
-#include "Board.h"
-#include "Constants.h"
+#include "Board.hpp"
+#include "Constants.hpp"
 #include <algorithm>
 #include <iostream>
 
