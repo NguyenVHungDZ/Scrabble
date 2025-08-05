@@ -3,7 +3,7 @@
 #define BOARD_H
 #include <vector>
 #include <string>
-#include "Tile.hpp" 
+#include "Tile.h" 
 
 // Forward declaration
 struct SDL_Renderer;

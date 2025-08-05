@@ -17,7 +17,7 @@ const int RACK_HEIGHT = 80;
 const int RACK_Y_POS = BOARD_Y_OFFSET + BOARD_SIZE_PX + 20; 
 const int PLAYER_RACK_SIZE = 8;
 const int UI_PANEL_X = BOARD_X_OFFSET + BOARD_SIZE_PX + 40; 
-const int MANUAL_ICON_SIZE = 75; 
+const int MANUAL_ICON_SIZE = 50;
 
 // --- A generic color struct since SDL_Color is no longer in headers ---
 struct Color { uint8_t r, g, b, a; };

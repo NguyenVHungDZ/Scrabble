@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Tile.hpp"
+#include "Tile.h"
 
 // Forward declarations
 struct SDL_Renderer;
@@ -14,7 +14,7 @@ class Player {
 public:
     Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont);
     ~Player();
-    void renderRack();
+    void renderRack(int mouseX, int mouseY);
     void refillRack();
     void resetRack(); 
     

@@ -3,12 +3,12 @@
 #include <SDL.h>
 #include <SDL_image.h> 
 #include <SDL_ttf.h>
-#include "Game.hpp"
-#include "Constants.hpp"
-#include "TextureManager.hpp"
-#include "Board.hpp"
-#include "Player.hpp"
-#include "Dictionary.hpp"
+#include "Game.h"
+#include "Constants.h"
+#include "TextureManager.h"
+#include "Board.h"
+#include "Player.h"
+#include "Dictionary.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -83,18 +83,16 @@ void Game::handleEvents() {
         SDL_GetMouseState(&mouseX, &mouseY);
 
         if (e.type == SDL_MOUSEBUTTONDOWN) {
-            // --- Manual Handling ---
             if (currentState == MANUAL) {
-                currentState = PLAYING; // Any click closes the manual
+                currentState = PLAYING; 
                 continue; 
             }
             if (mouseX >= manualButtonRect.x && mouseX < manualButtonRect.x + manualButtonRect.w &&
                 mouseY >= manualButtonRect.y && mouseY < manualButtonRect.y + manualButtonRect.h) {
-                currentState = MANUAL; // Click on icon opens the manual
+                currentState = MANUAL; 
                 continue; 
             }
             
-            // --- Game State Handling ---
             if (currentState == PLAYING) {
                 if (mouseX >= submitButtonRect.x && mouseX < submitButtonRect.x + submitButtonRect.w &&
                     mouseY >= submitButtonRect.y && mouseY < submitButtonRect.y + submitButtonRect.h) {
@@ -212,10 +210,10 @@ void Game::render() {
     SDL_SetRenderDrawColor(renderer, COLOR_BACKGROUND.r, COLOR_BACKGROUND.g, COLOR_BACKGROUND.b, COLOR_BACKGROUND.a);
     SDL_RenderClear(renderer);
     board->render();
-    player->renderRack();
+    player->renderRack(mouseX, mouseY);
     renderUI();
     if (selectedTile && currentState == PLAYING) {
-        selectedTile->render(mouseX - TILE_SIZE / 2, mouseY - TILE_SIZE / 2);
+        selectedTile->render(mouseX - TILE_SIZE / 2, mouseY - TILE_SIZE / 2, true, mouseX, mouseY);
     }
     if (currentState == GAME_OVER) {
         renderGameOver();

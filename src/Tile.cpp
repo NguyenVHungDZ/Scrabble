@@ -2,9 +2,9 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "Tile.hpp"
-#include "Constants.hpp"
-#include "TextureManager.hpp"
+#include "Tile.h"
+#include "Constants.h"
+#include "TextureManager.h"
 #include <string>
 
 Tile::Tile(char letter, int value, SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont)
@@ -22,12 +22,24 @@ Tile::~Tile() {
     if (letterTexture) SDL_DestroyTexture(letterTexture);
     if (valueTexture) SDL_DestroyTexture(valueTexture);
 }
-void Tile::render(int x, int y) {
+void Tile::render(int x, int y, bool isSelected, int mouseX, int mouseY) {
+    SDL_Rect tileRect = {x, y, TILE_SIZE, TILE_SIZE};
+    
+    bool isHovered = !isSelected && (mouseX >= tileRect.x && mouseX < tileRect.x + tileRect.w && 
+                                      mouseY >= tileRect.y && mouseY < tileRect.y + tileRect.h);
+
+    if (isSelected) {
+        SDL_SetTextureColorMod(letterTexture, 150, 150, 150); 
+    } else if (isHovered) {
+        SDL_SetTextureColorMod(letterTexture, 200, 200, 200); 
+    } else {
+        SDL_SetTextureColorMod(letterTexture, 255, 255, 255); 
+    }
+
     SDL_Rect shadowRect = {x + 2, y + 2, TILE_SIZE, TILE_SIZE};
     SDL_SetRenderDrawColor(renderer, COLOR_TILE_SHADOW.r, COLOR_TILE_SHADOW.g, COLOR_TILE_SHADOW.b, 100);
     SDL_RenderFillRect(renderer, &shadowRect);
     
-    SDL_Rect tileRect = {x, y, TILE_SIZE, TILE_SIZE};
     SDL_SetRenderDrawColor(renderer, COLOR_TILE_NORMAL.r, COLOR_TILE_NORMAL.g, COLOR_TILE_NORMAL.b, COLOR_TILE_NORMAL.a);
     SDL_RenderFillRect(renderer, &tileRect);
 

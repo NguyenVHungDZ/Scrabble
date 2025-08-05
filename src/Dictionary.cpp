@@ -1,6 +1,6 @@
 // -- src/Dictionary.cpp --
 #define SDL_MAIN_HANDLED
-#include "Dictionary.hpp"
+#include "Dictionary.h"
 #include <fstream>
 #include <iostream>
 #include <algorithm>

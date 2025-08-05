@@ -1,8 +1,8 @@
 // -- src/Board.cpp --
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
-#include "Board.hpp"
-#include "Constants.hpp"
+#include "Board.h"
+#include "Constants.h"
 #include <algorithm>
 #include <iostream>
 
@@ -20,7 +20,7 @@ void Board::render() {
             SDL_SetRenderDrawColor(renderer, 52, 73, 94, 100); 
             SDL_RenderDrawRect(renderer, &squareRect);
             if (tileGrid[row][col] != nullptr) {
-                tileGrid[row][col]->render(squareRect.x, squareRect.y);
+                tileGrid[row][col]->render(squareRect.x, squareRect.y, false, -1, -1);
             }
         }
     }

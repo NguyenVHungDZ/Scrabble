@@ -2,8 +2,8 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "Player.hpp"
-#include "Constants.hpp"
+#include "Player.h"
+#include "Constants.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
@@ -49,7 +49,7 @@ void Player::resetRack() {
     refillRack();
 }
 
-void Player::renderRack() {
+void Player::renderRack(int mouseX, int mouseY) {
     SDL_Rect rackRect = { BOARD_X_OFFSET, RACK_Y_POS, BOARD_SIZE_PX, RACK_HEIGHT };
     SDL_SetRenderDrawColor(renderer, COLOR_RACK_BG.r, COLOR_RACK_BG.g, COLOR_RACK_BG.b, COLOR_RACK_BG.a);
     SDL_RenderFillRect(renderer, &rackRect);
@@ -57,7 +57,7 @@ void Player::renderRack() {
     int rackTileY = RACK_Y_POS + (RACK_HEIGHT - TILE_SIZE) / 2;
     for (size_t i = 0; i < rack.size(); ++i) {
         if (rack[i]) {
-            rack[i]->render(startX + i * (TILE_SIZE + 5), rackTileY);
+            rack[i]->render(startX + i * (TILE_SIZE + 5), rackTileY, false, mouseX, mouseY);
         }
     }
 }

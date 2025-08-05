@@ -12,7 +12,7 @@ class Tile {
 public:
     Tile(char letter, int value, SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont);
     ~Tile();
-    void render(int x, int y);
+    void render(int x, int y, bool isSelected, int mouseX, int mouseY);
     char getLetter() const { return letter; }
     int getValue() const { return value; }
     int rackIndex;
