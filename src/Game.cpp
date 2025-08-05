@@ -1,6 +1,7 @@
 // -- src/Game.cpp --
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_image.h> 
 #include <SDL_ttf.h>
 #include "Game.h"
 #include "Constants.h"
@@ -10,10 +11,11 @@
 #include "Dictionary.h"
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 Game::Game() 
     : isRunning(false), currentState(PLAYING), highScore(0), window(nullptr), renderer(nullptr), 
-      mainFont(nullptr), smallFont(nullptr), uiFont(nullptr), gameOverFont(nullptr),
+      mainFont(nullptr), smallFont(nullptr), uiFont(nullptr), gameOverFont(nullptr), manualIconTexture(nullptr),
       board(nullptr), player(nullptr), dictionary(nullptr),
       selectedTile(nullptr), mouseX(0), mouseY(0) {}
 
@@ -23,11 +25,19 @@ Game::~Game() {
 
 bool Game::init() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0 || TTF_Init() == -1) { return false; }
+    
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        std::cerr << "ERROR: SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
+        return false;
+    }
+
     window = SDL_CreateWindow("Scrabble", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) { return false; }
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) { return false; }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    
     mainFont = TTF_OpenFont(FONT_PATH.c_str(), FONT_SIZE);
     smallFont = TTF_OpenFont(FONT_PATH.c_str(), FONT_SIZE_SMALL);
     uiFont = TTF_OpenFont(FONT_PATH.c_str(), FONT_SIZE_UI);
@@ -36,6 +46,13 @@ bool Game::init() {
         std::cerr << "ERROR: Failed to load font! TTF_Error: " << TTF_GetError() << std::endl;
         return false;
     }
+    
+    manualIconTexture = TextureManager::LoadImage(renderer, MANUAL_ICON_PATH);
+    if (!manualIconTexture) {
+        std::cerr << "ERROR: Failed to load manual icon!" << std::endl;
+        return false;
+    }
+
     loadHighScore();
     dictionary = new Dictionary(DICTIONARY_PATH);
     board = new Board(renderer);
@@ -45,6 +62,7 @@ bool Game::init() {
     recallButtonRect = { UI_PANEL_X, 110, 220, 50 };
     resetButtonRect = { UI_PANEL_X, 180, 220, 50 }; 
     startOverButtonRect = { SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 50, 200, 50 };
+    manualButtonRect = { SCREEN_WIDTH - (MANUAL_ICON_SIZE + 20), SCREEN_HEIGHT - (MANUAL_ICON_SIZE + 20), MANUAL_ICON_SIZE, MANUAL_ICON_SIZE };
 
     isRunning = true;
     return true;
@@ -64,8 +82,20 @@ void Game::handleEvents() {
         if (e.type == SDL_QUIT) { isRunning = false; }
         SDL_GetMouseState(&mouseX, &mouseY);
 
-        if (currentState == PLAYING) {
-            if (e.type == SDL_MOUSEBUTTONDOWN) {
+        if (e.type == SDL_MOUSEBUTTONDOWN) {
+            // --- Manual Handling ---
+            if (currentState == MANUAL) {
+                currentState = PLAYING; // Any click closes the manual
+                continue; 
+            }
+            if (mouseX >= manualButtonRect.x && mouseX < manualButtonRect.x + manualButtonRect.w &&
+                mouseY >= manualButtonRect.y && mouseY < manualButtonRect.y + manualButtonRect.h) {
+                currentState = MANUAL; // Click on icon opens the manual
+                continue; 
+            }
+            
+            // --- Game State Handling ---
+            if (currentState == PLAYING) {
                 if (mouseX >= submitButtonRect.x && mouseX < submitButtonRect.x + submitButtonRect.w &&
                     mouseY >= submitButtonRect.y && mouseY < submitButtonRect.y + submitButtonRect.h) {
                     submitWord(); continue;
@@ -88,25 +118,23 @@ void Game::handleEvents() {
                         break;
                     }
                 }
-            }
-            if (e.type == SDL_MOUSEBUTTONUP) {
-                if (selectedTile) {
-                    int boardCol = (mouseX - BOARD_X_OFFSET) / TILE_SIZE;
-                    int boardRow = (mouseY - BOARD_Y_OFFSET) / TILE_SIZE;
-                    if (boardRow >= 0 && boardRow < BOARD_DIMENSION && boardCol >= 0 && boardCol < BOARD_DIMENSION && !board->isOccupied(boardRow, boardCol)) {
-                        board->placeTemporaryTile(selectedTile, boardRow, boardCol);
-                    } else {
-                        player->returnTileToRack(selectedTile);
-                    }
-                    selectedTile = nullptr;
-                }
-            }
-        } else if (currentState == GAME_OVER) {
-            if (e.type == SDL_MOUSEBUTTONDOWN) {
+            } else if (currentState == GAME_OVER) {
                 if (mouseX >= startOverButtonRect.x && mouseX < startOverButtonRect.x + startOverButtonRect.w &&
                     mouseY >= startOverButtonRect.y && mouseY < startOverButtonRect.y + startOverButtonRect.h) {
                     startOver();
                 }
+            }
+        }
+        if (e.type == SDL_MOUSEBUTTONUP) {
+            if (selectedTile) {
+                int boardCol = (mouseX - BOARD_X_OFFSET) / TILE_SIZE;
+                int boardRow = (mouseY - BOARD_Y_OFFSET) / TILE_SIZE;
+                if (boardRow >= 0 && boardRow < BOARD_DIMENSION && boardCol >= 0 && boardCol < BOARD_DIMENSION && !board->isOccupied(boardRow, boardCol)) {
+                    board->placeTemporaryTile(selectedTile, boardRow, boardCol);
+                } else {
+                    player->returnTileToRack(selectedTile);
+                }
+                selectedTile = nullptr;
             }
         }
     }
@@ -192,49 +220,45 @@ void Game::render() {
     if (currentState == GAME_OVER) {
         renderGameOver();
     }
+    if (currentState == MANUAL) {
+        renderManual();
+    }
     SDL_RenderPresent(renderer);
 }
 
 void Game::renderUI() {
-    // --- Draw UI Panel Background ---
     SDL_Rect uiPanelRect = { UI_PANEL_X - 20, 0, SCREEN_WIDTH - (UI_PANEL_X - 20), SCREEN_HEIGHT };
     SDL_SetRenderDrawColor(renderer, COLOR_UI_PANEL.r, COLOR_UI_PANEL.g, COLOR_UI_PANEL.b, COLOR_UI_PANEL.a);
     SDL_RenderFillRect(renderer, &uiPanelRect);
-
-    // --- Helper lambda for drawing buttons with shadows and hover ---
     auto drawButton = [&](const SDL_Rect& rect, const std::string& text) {
+        Uint32 mouseState = SDL_GetMouseState(NULL, NULL);
         bool isHovered = (mouseX >= rect.x && mouseX < rect.x + rect.w && mouseY >= rect.y && mouseY < rect.y + rect.h);
+        bool isClicked = isHovered && (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT));
         const Color& bgColor = isHovered ? COLOR_BUTTON_HOVER : COLOR_BUTTON;
-
-        // Draw shadow
+        SDL_Rect buttonRect = rect;
         SDL_Rect shadowRect = { rect.x + 3, rect.y + 3, rect.w, rect.h };
-        SDL_SetRenderDrawColor(renderer, COLOR_BUTTON_SHADOW.r, COLOR_BUTTON_SHADOW.g, COLOR_BUTTON_SHADOW.b, COLOR_BUTTON_SHADOW.a);
-        SDL_RenderFillRect(renderer, &shadowRect);
-
-        // Draw main button
+        if (isClicked) {
+            buttonRect = shadowRect;
+        } else {
+            SDL_SetRenderDrawColor(renderer, COLOR_BUTTON_SHADOW.r, COLOR_BUTTON_SHADOW.g, COLOR_BUTTON_SHADOW.b, COLOR_BUTTON_SHADOW.a);
+            SDL_RenderFillRect(renderer, &shadowRect);
+        }
         SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-        SDL_RenderFillRect(renderer, &rect);
-
-        // Draw text
+        SDL_RenderFillRect(renderer, &buttonRect);
         SDL_Texture* textTexture = TextureManager::LoadText(renderer, uiFont, text, COLOR_TEXT_LIGHT);
         if (textTexture) {
             int w, h; SDL_QueryTexture(textTexture, NULL, NULL, &w, &h);
-            SDL_Rect dest = { rect.x + (rect.w - w) / 2, rect.y + (rect.h - h) / 2, w, h };
+            SDL_Rect dest = { buttonRect.x + (buttonRect.w - w) / 2, buttonRect.y + (buttonRect.h - h) / 2, w, h };
             SDL_RenderCopy(renderer, textTexture, NULL, &dest);
             SDL_DestroyTexture(textTexture);
         }
     };
-
-    // --- Draw all buttons ---
     drawButton(submitButtonRect, "Submit Word");
     drawButton(recallButtonRect, "Recall Tiles");
     drawButton(resetButtonRect, "Reset Letters");
-
-    // --- Draw Score Info Text ---
     std::string highScoreText = "High Score: " + std::to_string(highScore);
     std::string scoreText = "Current Score: " + std::to_string(player->getScore());
     std::string livesText = "Resets Left: " + std::to_string(player->getLives());
-
     SDL_Texture* highScoreTexture = TextureManager::LoadText(renderer, uiFont, highScoreText, COLOR_TEXT_LIGHT);
     if(highScoreTexture) {
         int w, h; SDL_QueryTexture(highScoreTexture, NULL, NULL, &w, &h);
@@ -255,6 +279,16 @@ void Game::renderUI() {
         SDL_Rect dest = { UI_PANEL_X, 380, w, h};
         SDL_RenderCopy(renderer, livesTexture, NULL, &dest);
         SDL_DestroyTexture(livesTexture);
+    }
+    if (manualIconTexture) {
+        bool isHovered = (mouseX >= manualButtonRect.x && mouseX < manualButtonRect.x + manualButtonRect.w &&
+                          mouseY >= manualButtonRect.y && mouseY < manualButtonRect.y + manualButtonRect.h);
+        if (isHovered) {
+            SDL_SetTextureColorMod(manualIconTexture, 200, 200, 200); 
+        } else {
+            SDL_SetTextureColorMod(manualIconTexture, 255, 255, 255); 
+        }
+        SDL_RenderCopy(renderer, manualIconTexture, NULL, &manualButtonRect);
     }
 }
 
@@ -280,18 +314,56 @@ void Game::renderGameOver() {
         SDL_RenderCopy(renderer, scoreTexture, NULL, &dest);
         SDL_DestroyTexture(scoreTexture);
     }
-    
-    // Draw Start Over button with hover effect
+    Uint32 mouseState = SDL_GetMouseState(NULL, NULL);
     bool isHovered = (mouseX >= startOverButtonRect.x && mouseX < startOverButtonRect.x + startOverButtonRect.w && mouseY >= startOverButtonRect.y && mouseY < startOverButtonRect.y + startOverButtonRect.h);
+    bool isClicked = isHovered && (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT));
     const Color& bgColor = isHovered ? COLOR_BUTTON_HOVER : COLOR_BUTTON;
+    SDL_Rect buttonRect = startOverButtonRect;
+    SDL_Rect shadowRect = { startOverButtonRect.x + 3, startOverButtonRect.y + 3, startOverButtonRect.w, startOverButtonRect.h };
+    if (isClicked) {
+        buttonRect = shadowRect;
+    } else {
+        SDL_SetRenderDrawColor(renderer, COLOR_BUTTON_SHADOW.r, COLOR_BUTTON_SHADOW.g, COLOR_BUTTON_SHADOW.b, COLOR_BUTTON_SHADOW.a);
+        SDL_RenderFillRect(renderer, &shadowRect);
+    }
     SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-    SDL_RenderFillRect(renderer, &startOverButtonRect);
+    SDL_RenderFillRect(renderer, &buttonRect);
     SDL_Texture* buttonTexture = TextureManager::LoadText(renderer, uiFont, "Start Over", COLOR_TEXT_LIGHT);
     if (buttonTexture) {
         int w, h; SDL_QueryTexture(buttonTexture, NULL, NULL, &w, &h);
-        SDL_Rect dest = { startOverButtonRect.x + (startOverButtonRect.w - w) / 2, startOverButtonRect.y + (startOverButtonRect.h - h) / 2, w, h };
+        SDL_Rect dest = { buttonRect.x + (buttonRect.w - w) / 2, buttonRect.y + (buttonRect.h - h) / 2, w, h };
         SDL_RenderCopy(renderer, buttonTexture, NULL, &dest);
         SDL_DestroyTexture(buttonTexture);
+    }
+}
+
+void Game::renderManual() {
+    SDL_Rect overlay = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    SDL_SetRenderDrawColor(renderer, COLOR_GAMEOVER_BG.r, COLOR_GAMEOVER_BG.g, COLOR_GAMEOVER_BG.b, 240);
+    SDL_RenderFillRect(renderer, &overlay);
+    
+    std::vector<std::string> manualLines = {
+        "How to Play",
+        "",
+        "1. Drag letters from your rack to the board to form words.",
+        "2. Words must be in a single row or column.",
+        "3. Click 'Submit Word' to score points.",
+        "4. Use 'Reset Letters' to get new tiles (costs 1 reset).",
+        "5. The game ends when you have 0 resets left.",
+        "",
+        "Click anywhere to close this guide."
+    };
+
+    int startY = 150;
+    for (const auto& line : manualLines) {
+        SDL_Texture* tex = TextureManager::LoadText(renderer, uiFont, line, COLOR_TEXT_LIGHT);
+        if (tex) {
+            int w, h; SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+            SDL_Rect dest = { SCREEN_WIDTH / 2 - w / 2, startY, w, h };
+            SDL_RenderCopy(renderer, tex, NULL, &dest);
+            SDL_DestroyTexture(tex);
+            startY += h + 10;
+        }
     }
 }
 
@@ -303,8 +375,10 @@ void Game::cleanup() {
     if (smallFont) TTF_CloseFont(smallFont);
     if (uiFont) TTF_CloseFont(uiFont);
     if (gameOverFont) TTF_CloseFont(gameOverFont);
+    if (manualIconTexture) SDL_DestroyTexture(manualIconTexture);
     if (renderer) SDL_DestroyRenderer(renderer);
     if (window) SDL_DestroyWindow(window);
+    IMG_Quit(); 
     TTF_Quit();
     SDL_Quit();
 }

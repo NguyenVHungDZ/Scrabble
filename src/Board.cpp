@@ -17,7 +17,7 @@ void Board::render() {
         for (int col = 0; col < BOARD_DIMENSION; ++col) {
             renderBonusSquare(row, col);
             SDL_Rect squareRect = { BOARD_X_OFFSET + col * TILE_SIZE, BOARD_Y_OFFSET + row * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-            SDL_SetRenderDrawColor(renderer, 52, 73, 94, 100); // Subtle grid lines
+            SDL_SetRenderDrawColor(renderer, 52, 73, 94, 100); 
             SDL_RenderDrawRect(renderer, &squareRect);
             if (tileGrid[row][col] != nullptr) {
                 tileGrid[row][col]->render(squareRect.x, squareRect.y);

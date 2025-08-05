@@ -21,7 +21,7 @@ private:
     char letter;
     int value;
     SDL_Renderer* renderer;
-    SDL_Texture* letterTexture;
+    SDL_Texture* letterTexture; 
     SDL_Texture* valueTexture;
 };
 #endif // TILE_H

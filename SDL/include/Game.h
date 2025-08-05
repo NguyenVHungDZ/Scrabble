@@ -7,6 +7,7 @@
 // Forward declarations
 struct SDL_Window;
 struct SDL_Renderer;
+struct SDL_Texture;
 typedef struct TTF_Font TTF_Font;
 class Board;
 class Player;
@@ -15,7 +16,8 @@ class Dictionary;
 
 enum GameState {
     PLAYING,
-    GAME_OVER
+    GAME_OVER,
+    MANUAL 
 };
 
 class Game {
@@ -36,7 +38,8 @@ private:
     void loadHighScore();
     void saveHighScore();
     void startOver();
-    void renderGameOver();
+    void renderGameOver(); // CORRECTED: Declaration added
+    void renderManual();
 
     bool isRunning;
     GameState currentState; 
@@ -44,10 +47,11 @@ private:
 
     SDL_Window* window;
     SDL_Renderer* renderer;
-    TTF_Font* mainFont;
-    TTF_Font* smallFont;
+    TTF_Font* mainFont; 
+    TTF_Font* smallFont; 
     TTF_Font* uiFont;
     TTF_Font* gameOverFont; 
+    SDL_Texture* manualIconTexture; 
 
     Board* board;
     Player* player;
@@ -60,5 +64,6 @@ private:
     SDL_Rect recallButtonRect;
     SDL_Rect resetButtonRect;
     SDL_Rect startOverButtonRect; 
+    SDL_Rect manualButtonRect; 
 };
 #endif // GAME_H
