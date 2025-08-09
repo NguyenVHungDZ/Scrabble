@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace std;
+
 Player::Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont) 
     : renderer(renderer), font(font), smallFont(smallFont), score(0), lives(3) { 
     initializeTileBag();
@@ -43,9 +45,9 @@ void Player::resetRack() {
             rack[i] = nullptr;
         }
     }
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(tileBag.begin(), tileBag.end(), g);
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(tileBag.begin(), tileBag.end(), g);
     refillRack();
 }
 
@@ -84,7 +86,7 @@ void Player::initializeTileBag() {
         {'O', 1}, {'P', 3}, {'Q', 10}, {'R', 1}, {'S', 1}, {'T', 1}, {'U', 1},
         {'V', 4}, {'W', 4}, {'X', 8}, {'Y', 4}, {'Z', 10}, {' ', 0}
     };
-    std::map<char, int> tileCounts = {
+    map<char, int> tileCounts = {
         {'A', 9}, {'B', 2}, {'C', 2}, {'D', 4}, {'E', 12}, {'F', 2}, {'G', 3},
         {'H', 2}, {'I', 9}, {'J', 1}, {'K', 1}, {'L', 4}, {'M', 2}, {'N', 6},
         {'O', 8}, {'P', 2}, {'Q', 1}, {'R', 6}, {'S', 4}, {'T', 6}, {'U', 4},
@@ -93,7 +95,7 @@ void Player::initializeTileBag() {
     for (auto const& [letter, count] : tileCounts) {
         for (int i = 0; i < count; ++i) tileBag.push_back(letter);
     }
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(tileBag.begin(), tileBag.end(), g);
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(tileBag.begin(), tileBag.end(), g);
 }

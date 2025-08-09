@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace std;
+
 Board::Board(SDL_Renderer* renderer) : renderer(renderer) {
-    bonusGrid.resize(BOARD_DIMENSION, std::vector<Bonus>(BOARD_DIMENSION, NONE));
-    tileGrid.resize(BOARD_DIMENSION, std::vector<Tile*>(BOARD_DIMENSION, nullptr));
+    bonusGrid.resize(BOARD_DIMENSION, vector<Bonus>(BOARD_DIMENSION, NONE));
+    tileGrid.resize(BOARD_DIMENSION, vector<Tile*>(BOARD_DIMENSION, nullptr));
     initializeBonusSquares();
 }
 Board::~Board() {}
@@ -33,7 +35,7 @@ void Board::placeTemporaryTile(Tile* tile, int row, int col) {
     tileGrid[row][col] = tile;
     tile->boardRow = row;
     tile->boardCol = col;
-    auto it = std::find(tempPlacedTiles.begin(), tempPlacedTiles.end(), tile);
+    auto it = find(tempPlacedTiles.begin(), tempPlacedTiles.end(), tile);
     if(it == tempPlacedTiles.end()) {
         tempPlacedTiles.push_back(tile);
     }
@@ -45,7 +47,7 @@ bool Board::isOccupied(int row, int col) {
 WordPlacement Board::getPlacedWord() {
     WordPlacement result;
     if (tempPlacedTiles.empty()) return result;
-    std::sort(tempPlacedTiles.begin(), tempPlacedTiles.end(), [](Tile* a, Tile* b) {
+    sort(tempPlacedTiles.begin(), tempPlacedTiles.end(), [](Tile* a, Tile* b) {
         if (a->boardRow != b->boardRow) return a->boardRow < b->boardRow;
         return a->boardCol < b->boardCol;
     });
@@ -61,7 +63,7 @@ WordPlacement Board::getPlacedWord() {
     result.isValid = true;
     return result;
 }
-void Board::recallTiles(std::vector<Tile*>& playerRack) {
+void Board::recallTiles(vector<Tile*>& playerRack) {
     for (Tile* tile : tempPlacedTiles) {
         tileGrid[tile->boardRow][tile->boardCol] = nullptr;
         tile->boardRow = -1;
