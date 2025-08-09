@@ -17,12 +17,14 @@ struct WordPlacement {
 };
 class Board {
 public:
+    const vector<Tile*>& getTempPlacedTiles() const { return tempPlacedTiles; }
+    Bonus getBonusAt(int row, int col) const { return bonusGrid[row][col]; }
     Board(SDL_Renderer* renderer);
     ~Board();
     void render();
     void placeTemporaryTile(Tile* tile, int row, int col);
     bool isOccupied(int row, int col);
-    WordPlacement getPlacedWord();
+    vector<WordPlacement> findAllNewWords();
     void recallTiles(vector<Tile*>& playerRack);
     void finalizeTurn();
     int calculateScore(const WordPlacement& placement);

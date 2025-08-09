@@ -139,20 +139,67 @@ void Game::handleEvents() {
 }
 
 void Game::submitWord() {
-    WordPlacement placement = board->getPlacedWord();
-    if (!placement.isValid) {
-        std::cout << "Invalid placement." << std::endl;
+    // 1. Find all words formed by the temporary tiles
+    vector<WordPlacement> placements = board->findAllNewWords();
+
+    if (placements.empty()) {
+        cout << "Invalid placement. Words must be connected and form a single line." << endl;
         recallAllTiles();
         return;
     }
-    if (dictionary->isValidWord(placement.word)) {
-        int score = board->calculateScore(placement);
-        player->addScore(score);
-        std::cout << "Word '" << placement.word << "' is valid! Score: " << score << std::endl;
+
+    // 2. Validate every new word against the dictionary
+    bool allWordsValid = true;
+    for (const auto& placement : placements) {
+        if (!dictionary->isValidWord(placement.word)) {
+            cout << "Word '" << placement.word << "' is not in the dictionary." << endl;
+            allWordsValid = false;
+            break; // One invalid word makes the whole move invalid
+        }
+    }
+
+    // 3. If all words are valid, calculate score and finalize the turn
+    if (allWordsValid) {
+        int totalTurnScore = 0;
+        int wordMultipliers = 1;
+
+        // First, sum the base letter scores and find word multipliers
+        for (const auto& placement : placements) {
+            for (Tile* tile : placement.tiles) {
+                 // Check if this tile is one of the newly placed ones
+                bool isNewTile = false;
+                for (Tile* tempTile : board->getTempPlacedTiles()) { // You'll need to add a simple getter for this
+                    if (tile == tempTile) {
+                        isNewTile = true;
+                        break;
+                    }
+                }
+
+                // Word bonuses are only triggered by newly placed tiles
+                if(isNewTile) {
+                    Bonus bonus = board->getBonusAt(tile->boardRow, tile->boardCol); // You'll need to add this getter too
+                    if (bonus == DOUBLE_WORD || bonus == CENTER) wordMultipliers *= 2;
+                    if (bonus == TRIPLE_WORD) wordMultipliers *= 3;
+                }
+            }
+        }
+        
+        // Then, calculate score for each word and apply multipliers
+        for (const auto& placement : placements) {
+            int wordScore = board->calculateScore(placement);
+            cout << "Word '" << placement.word << "' is valid! Score: " << wordScore << endl;
+            totalTurnScore += wordScore;
+        }
+
+        totalTurnScore *= wordMultipliers;
+
+        cout << "Total score for turn: " << totalTurnScore << endl;
+        player->addScore(totalTurnScore);
         board->finalizeTurn();
         player->refillRack();
+
     } else {
-        std::cout << "Word '" << placement.word << "' is not in the dictionary." << std::endl;
+        cout << "Your move was invalid. Recalling tiles." << endl;
         recallAllTiles();
     }
 }

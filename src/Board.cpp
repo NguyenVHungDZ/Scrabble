@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include <algorithm>
 #include <iostream>
+#include <set> 
 
 using namespace std;
 
@@ -44,24 +45,140 @@ bool Board::isOccupied(int row, int col) {
     if (row < 0 || row >= BOARD_DIMENSION || col < 0 || col >= BOARD_DIMENSION) return true;
     return tileGrid[row][col] != nullptr;
 }
-WordPlacement Board::getPlacedWord() {
-    WordPlacement result;
-    if (tempPlacedTiles.empty()) return result;
-    sort(tempPlacedTiles.begin(), tempPlacedTiles.end(), [](Tile* a, Tile* b) {
+vector<WordPlacement> Board::findAllNewWords() {
+    vector<WordPlacement> foundWords;
+    if (tempPlacedTiles.empty()) {
+        return foundWords; // Return empty vector if no tiles were placed
+    }
+
+    // Use a set to avoid adding duplicate words
+    set<string> distinctWords;
+
+    // Sort tiles to easily find orientation and boundaries
+    sort(tempPlacedTiles.begin(), tempPlacedTiles.end(), [](const Tile* a, const Tile* b) {
         if (a->boardRow != b->boardRow) return a->boardRow < b->boardRow;
         return a->boardCol < b->boardCol;
     });
-    bool isHorizontal = true, isVertical = true;
-    int firstRow = tempPlacedTiles[0]->boardRow, firstCol = tempPlacedTiles[0]->boardCol;
-    for (size_t i = 1; i < tempPlacedTiles.size(); ++i) {
-        if (tempPlacedTiles[i]->boardRow != firstRow) isHorizontal = false;
-        if (tempPlacedTiles[i]->boardCol != firstCol) isVertical = false;
+
+    // Determine the primary orientation (horizontal or vertical)
+    bool isHorizontal = true;
+    bool isVertical = true;
+    if (tempPlacedTiles.size() > 1) {
+        int firstRow = tempPlacedTiles.front()->boardRow;
+        int firstCol = tempPlacedTiles.front()->boardCol;
+        for (size_t i = 1; i < tempPlacedTiles.size(); ++i) {
+            if (tempPlacedTiles[i]->boardRow != firstRow) isHorizontal = false;
+            if (tempPlacedTiles[i]->boardCol != firstCol) isVertical = false;
+        }
     }
-    if (!isHorizontal && !isVertical) { result.isValid = false; return result; }
-    result.tiles = tempPlacedTiles;
-    for(const auto& tile : result.tiles) { result.word += tile->getLetter(); }
-    result.isValid = true;
-    return result;
+
+    // --- Find the main word (along the primary orientation) ---
+    if (isHorizontal) {
+        Tile* startTile = tempPlacedTiles.front();
+        int row = startTile->boardRow;
+        int startCol = startTile->boardCol;
+
+        // Go left from the first placed tile to find the beginning of the word
+        while (startCol > 0 && tileGrid[row][startCol - 1] != nullptr) {
+            startCol--;
+        }
+
+        // Reconstruct the full horizontal word
+        WordPlacement mainWord;
+        int currentCol = startCol;
+        while (currentCol < BOARD_DIMENSION && tileGrid[row][currentCol] != nullptr) {
+            Tile* currentTile = tileGrid[row][currentCol];
+            mainWord.word += currentTile->getLetter();
+            mainWord.tiles.push_back(currentTile);
+            currentCol++;
+        }
+
+        if (mainWord.word.length() > 1) {
+            if (distinctWords.find(mainWord.word) == distinctWords.end()) {
+                 mainWord.isValid = true;
+                 foundWords.push_back(mainWord);
+                 distinctWords.insert(mainWord.word);
+            }
+        }
+    }
+    
+    // --- Now do the same for the vertical orientation ---
+    if (isVertical) {
+        Tile* startTile = tempPlacedTiles.front();
+        int startRow = startTile->boardRow;
+        int col = startTile->boardCol;
+
+        while (startRow > 0 && tileGrid[startRow - 1][col] != nullptr) {
+            startRow--;
+        }
+
+        WordPlacement mainWord;
+        int currentRow = startRow;
+        while (currentRow < BOARD_DIMENSION && tileGrid[currentRow][col] != nullptr) {
+             Tile* currentTile = tileGrid[currentRow][col];
+            mainWord.word += currentTile->getLetter();
+            mainWord.tiles.push_back(currentTile);
+            currentRow++;
+        }
+
+        if (mainWord.word.length() > 1) {
+            if (distinctWords.find(mainWord.word) == distinctWords.end()) {
+                mainWord.isValid = true;
+                foundWords.push_back(mainWord);
+                distinctWords.insert(mainWord.word);
+            }
+        }
+    }
+
+    // --- Find secondary (perpendicular) words for each new tile ---
+    for (Tile* newTile : tempPlacedTiles) {
+        if (isHorizontal) { // Check vertically for each tile
+            int startRow = newTile->boardRow;
+            int col = newTile->boardCol;
+            while (startRow > 0 && tileGrid[startRow - 1][col] != nullptr) {
+                startRow--;
+            }
+            WordPlacement secondaryWord;
+            int currentRow = startRow;
+            while (currentRow < BOARD_DIMENSION && tileGrid[currentRow][col] != nullptr) {
+                Tile* currentTile = tileGrid[currentRow][col];
+                secondaryWord.word += currentTile->getLetter();
+                secondaryWord.tiles.push_back(currentTile);
+                currentRow++;
+            }
+             if (secondaryWord.word.length() > 1) {
+                if (distinctWords.find(secondaryWord.word) == distinctWords.end()) {
+                    secondaryWord.isValid = true;
+                    foundWords.push_back(secondaryWord);
+                    distinctWords.insert(secondaryWord.word);
+                }
+            }
+        }
+        if (isVertical) { // Check horizontally for each tile
+             int row = newTile->boardRow;
+             int startCol = newTile->boardCol;
+             while (startCol > 0 && tileGrid[row][startCol - 1] != nullptr) {
+                startCol--;
+             }
+             WordPlacement secondaryWord;
+             int currentCol = startCol;
+             while (currentCol < BOARD_DIMENSION && tileGrid[row][currentCol] != nullptr) {
+                Tile* currentTile = tileGrid[row][currentCol];
+                secondaryWord.word += currentTile->getLetter();
+                secondaryWord.tiles.push_back(currentTile);
+                currentCol++;
+             }
+             if (secondaryWord.word.length() > 1) {
+                if (distinctWords.find(secondaryWord.word) == distinctWords.end()) {
+                    secondaryWord.isValid = true;
+                    foundWords.push_back(secondaryWord);
+                    distinctWords.insert(secondaryWord.word);
+                }
+            }
+        }
+    }
+
+    return foundWords;
 }
 void Board::recallTiles(vector<Tile*>& playerRack) {
     for (Tile* tile : tempPlacedTiles) {
