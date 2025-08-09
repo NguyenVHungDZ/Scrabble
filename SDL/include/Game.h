@@ -38,7 +38,7 @@ private:
     void loadHighScore();
     void saveHighScore();
     void startOver();
-    void renderGameOver(); // CORRECTED: Declaration added
+    void renderGameOver(); 
     void renderManual();
 
     bool isRunning;

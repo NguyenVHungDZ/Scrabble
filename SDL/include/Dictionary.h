@@ -3,11 +3,13 @@
 #define DICTIONARY_H
 #include <string>
 #include <unordered_set>
+
+using namespace std;
 class Dictionary {
 public:
-    Dictionary(const std::string& path);
-    bool isValidWord(const std::string& word) const;
+    Dictionary(const string& path);
+    bool isValidWord(const string& word) const;
 private:
-    std::unordered_set<std::string> wordList;
+    unordered_set<string> wordList;
 };
-#endif // DICTIONARY_H
+#endif 

@@ -6,19 +6,21 @@
 #include <algorithm>
 #include <cctype>
 
-Dictionary::Dictionary(const std::string& path) {
-    std::ifstream file(path);
+using namespace std;
+
+Dictionary::Dictionary(const string& path) {
+    ifstream file(path);
     if (!file.is_open()) { 
-        std::cerr << "ERROR: Could not open dictionary file at " << path << std::endl;
+        cerr << "ERROR: Could not open dictionary file at " << path << endl;
         return; 
     }
-    std::string word;
+    string word;
     while (file >> word) {
-        std::transform(word.begin(), word.end(), word.begin(),
-                       [](unsigned char c){ return std::toupper(c); });
+        transform(word.begin(), word.end(), word.begin(),
+                       [](unsigned char c){ return toupper(c); });
         wordList.insert(word);
     }
 }
-bool Dictionary::isValidWord(const std::string& word) const {
+bool Dictionary::isValidWord(const string& word) const {
     return wordList.count(word) > 0;
 }

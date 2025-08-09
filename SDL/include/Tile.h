@@ -3,6 +3,8 @@
 #define TILE_H
 #include <string>
 
+using namespace std;
+
 // Forward declarations
 struct SDL_Renderer;
 struct SDL_Texture;
