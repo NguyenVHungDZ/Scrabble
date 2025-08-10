@@ -8,6 +8,7 @@
 using namespace std;
 
 struct SDL_Renderer;
+typedef struct TTF_Font TTF_Font;
 
 enum Bonus { NONE, DOUBLE_LETTER, TRIPLE_LETTER, DOUBLE_WORD, TRIPLE_WORD, CENTER };
 struct WordPlacement {
@@ -19,7 +20,7 @@ class Board {
 public:
     const vector<Tile*>& getTempPlacedTiles() const { return tempPlacedTiles; }
     Bonus getBonusAt(int row, int col) const { return bonusGrid[row][col]; }
-    Board(SDL_Renderer* renderer);
+    Board(SDL_Renderer* renderer, TTF_Font* font);
     ~Board();
     void render();
     void placeTemporaryTile(Tile* tile, int row, int col);
@@ -32,6 +33,7 @@ private:
     void initializeBonusSquares();
     void renderBonusSquare(int row, int col);
     SDL_Renderer* renderer;
+    TTF_Font* textFont;
     vector<vector<Bonus>> bonusGrid;
     vector<vector<Tile*>> tileGrid;
     vector<Tile*> tempPlacedTiles;

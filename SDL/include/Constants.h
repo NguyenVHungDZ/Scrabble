@@ -1,4 +1,3 @@
-// -- include/Constants.h --
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
@@ -7,7 +6,6 @@
 
 using namespace std;
 
-// --- Screen and Layout ---
 const int SCREEN_WIDTH = 1100; 
 const int SCREEN_HEIGHT = 850; 
 const int BOARD_DIMENSION = 15; // 15 x 15 board
@@ -21,11 +19,10 @@ const int PLAYER_RACK_SIZE = 7;
 const int UI_PANEL_X = BOARD_X_OFFSET + BOARD_SIZE_PX + 40; 
 const int MANUAL_ICON_SIZE = 50; // Guide icon's size
 
-// --- A generic color ---
 struct Color { uint8_t r, g, b, a; };
 
-// --- MODERN COLOR PALETTE ---
-const Color COLOR_BACKGROUND = { 44, 62, 80, 255 }; //background     
+// --- Main color ---
+const Color COLOR_BACKGROUND = { 224, 224, 224, 255 }; //background     
 const Color COLOR_UI_PANEL = { 52, 73, 94, 255 };        
 const Color COLOR_TILE_NORMAL = { 241, 196, 15, 255 };     
 const Color COLOR_TILE_SHADOW = { 192, 57, 43, 255 };      
@@ -35,14 +32,14 @@ const Color COLOR_TEXT_DARK = { 44, 62, 80, 255 };
 const Color COLOR_BUTTON = { 26, 188, 156, 255 };         
 const Color COLOR_BUTTON_HOVER = { 22, 160, 133, 255 };    
 const Color COLOR_BUTTON_SHADOW = { 19, 118, 99, 255 };     
-const Color COLOR_RACK_BG = { 44, 62, 80, 255 };          
+const Color COLOR_RACK_BG = { 199, 199, 199, 255 }; // Grey          
 const Color COLOR_GAMEOVER_BG = { 0, 0, 0, 220 }; 
 const Color COLOR_GAMEOVER_DIALOG = { 52, 73, 94, 255 }; 
-const Color COLOR_DBL_LETTER = { 52, 152, 219, 255 };     
-const Color COLOR_TRP_LETTER = { 41, 128, 185, 255 };     
-const Color COLOR_DBL_WORD = { 155, 89, 182, 255 };      
-const Color COLOR_TRP_WORD = { 142, 68, 173, 255 };      
-const Color COLOR_CENTER_STAR = { 243, 156, 18, 255 };    
+const Color COLOR_DBL_LETTER = { 212, 215, 250, 255 }; // Light blue     
+const Color COLOR_TRP_LETTER = { 105, 116, 250, 255 }; // Dark blue   
+const Color COLOR_DBL_WORD = { 255, 173, 175, 255 }; // Light red      
+const Color COLOR_TRP_WORD = { 252, 78, 83, 255 }; // Dark red      
+const Color COLOR_CENTER_STAR = { 243, 156, 18, 255 }; // Yellow    
 
 // --- Game Data's Paths ---
 const string FONT_PATH = "assets/montserrat.ttf";
@@ -55,4 +52,4 @@ const int FONT_SIZE_SMALL = 10;
 const int FONT_SIZE_UI = 18;
 const int FONT_SIZE_GAMEOVER = 48;
 
-#endif // CONSTANTS_H
+#endif 

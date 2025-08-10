@@ -55,7 +55,7 @@ bool Game::init() {
 
     loadHighScore();
     dictionary = new Dictionary(DICTIONARY_PATH);
-    board = new Board(renderer);
+    board = new Board(renderer, uiFont);
     player = new Player(renderer, mainFont, smallFont);
     
     submitButtonRect = { UI_PANEL_X, 40, 220, 50 };
@@ -226,7 +226,7 @@ void Game::startOver() {
     std::cout << "Starting a new game..." << std::endl;
     delete board;
     delete player;
-    board = new Board(renderer);
+    board = new Board(renderer, uiFont);
     player = new Player(renderer, mainFont, smallFont);
     currentState = PLAYING;
 }
