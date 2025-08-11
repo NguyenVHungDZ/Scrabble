@@ -44,6 +44,7 @@ private:
     bool isRunning;
     GameState currentState; 
     int highScore; 
+    bool isFirstTurn;
 
     SDL_Window* window;
     SDL_Renderer* renderer;
