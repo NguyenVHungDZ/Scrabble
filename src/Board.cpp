@@ -309,10 +309,8 @@ int Board::calculateScore(const WordPlacement& placement) {
             switch (bonus) {
                 case DOUBLE_LETTER: letterScore *= 2; break; // Nhân đôi điểm chữ cái
                 case TRIPLE_LETTER: letterScore *= 3; break; // Nhân ba điểm chữ cái
-                case DOUBLE_WORD:   // Nhân đôi điểm từ
-                case CENTER:        // Ô trung tâm cũng là nhân đôi điểm từ
-                    wordMultiplier *= 2; 
-                    break;
+                case DOUBLE_WORD: wordMultiplier *= 2; break; // Nhân đôi điểm từ
+                case CENTER: break;
                 case TRIPLE_WORD: wordMultiplier *= 3; break; // Nhân ba điểm từ
                 default: break;
             }
@@ -393,7 +391,7 @@ void Board::renderBonusSquare(int row, int col) {
             break;
         case CENTER:        
             c = &COLOR_CENTER_STAR;
-            bonusText = "★"; // Sử dụng ký tự ngôi sao cho ô trung tâm
+            bonusText = "Start"; // Sử dụng ký tự ngôi sao cho ô trung tâm
             break;
         default: 
             // Đây là ô trống bình thường, không cần vẽ gì đặc biệt
