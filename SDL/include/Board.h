@@ -19,7 +19,7 @@ class Board {
 public:
     const vector<Tile*>& getTempPlacedTiles() const { return tempPlacedTiles; }
     Bonus getBonusAt(int row, int col) const { return bonusGrid[row][col]; }
-    Board(SDL_Renderer* renderer, TTF_Font* font);
+    Board(SDL_Renderer* renderer, TTF_Font* font, int yOffset);
     ~Board();
     void render();
     void placeTemporaryTile(Tile* tile, int row, int col);
@@ -33,6 +33,7 @@ private:
     void renderBonusSquare(int row, int col);
     SDL_Renderer* renderer;
     TTF_Font* textFont;
+    int boardYOffset;
     vector<vector<Bonus>> bonusGrid;
     vector<vector<Tile*>> tileGrid;
     vector<Tile*> tempPlacedTiles;

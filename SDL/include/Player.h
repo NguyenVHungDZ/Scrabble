@@ -13,31 +13,33 @@ typedef struct TTF_Font TTF_Font;
 
 class Player {
 public:
-    Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont);
+    Player(string name, SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont);
     ~Player();
-    void renderRack(int mouseX, int mouseY);
-    void refillRack();
-    void resetRack(); 
-    
+
+    void renderRack(int mouseX, int mouseY, int yPos, bool isActive);
+    void refillRack(vector<char>& tileBag, const map<char, int>& tileValues);
+    void resetRack(vector<char>& tileBag);
+
     vector<Tile*>& getRack() { return rack; }
     Tile* getTileFromRack(int index);
     void removeTileFromRack(int index);
     void returnTileToRack(Tile* tile);
-    
+
+    string getName() const { return name; }
     int getScore() const { return score; }
     void addScore(int points) { score += points; }
-    int getLives() const { return lives; } 
+    void setScore(int newScore) { score = newScore; }
+    int getLives() const { return lives; }
+    void useLife() { if (lives > 0) lives--; }
+    bool hasTiles() const;
 
 private:
-    void initializeTileBag();
+    string name;
     SDL_Renderer* renderer;
     TTF_Font* font;
     TTF_Font* smallFont;
     int score;
-    int lives; 
+    int lives;
     vector<Tile*> rack;
-    
-    vector<char> tileBag;
-    map<char, int> tileValues;
 };
-#endif 
+#endif
