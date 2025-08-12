@@ -1,4 +1,3 @@
-// -- include/Board.h --
 #ifndef BOARD_H
 #define BOARD_H
 #include <vector>
@@ -38,4 +37,4 @@ private:
     vector<vector<Tile*>> tileGrid;
     vector<Tile*> tempPlacedTiles;
 };
-#endif // BOARD_H
+#endif 

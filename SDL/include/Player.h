@@ -8,7 +8,6 @@
 
 using namespace std;
 
-// Forward declarations
 struct SDL_Renderer;
 typedef struct TTF_Font TTF_Font;
 

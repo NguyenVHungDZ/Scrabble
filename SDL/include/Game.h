@@ -67,4 +67,4 @@ private:
     SDL_Rect startOverButtonRect; 
     SDL_Rect manualButtonRect; 
 };
-#endif // GAME_H
+#endif

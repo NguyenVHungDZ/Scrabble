@@ -1,11 +1,9 @@
-// -- include/Tile.h --
 #ifndef TILE_H
 #define TILE_H
 #include <string>
 
 using namespace std;
 
-// Forward declarations
 struct SDL_Renderer;
 struct SDL_Texture;
 typedef struct TTF_Font TTF_Font;
@@ -26,4 +24,4 @@ private:
     SDL_Texture* letterTexture; 
     SDL_Texture* valueTexture;
 };
-#endif // TILE_H
+#endif 

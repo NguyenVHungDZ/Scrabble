@@ -1,4 +1,3 @@
-// -- src/Dictionary.cpp --
 #define SDL_MAIN_HANDLED
 #include "Dictionary.h"
 #include <fstream>
