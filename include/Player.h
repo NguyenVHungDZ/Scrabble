@@ -1,6 +1,6 @@
-// -- include/Player.h --
 #ifndef PLAYER_H
 #define PLAYER_H
+
 #include <vector>
 #include <string>
 #include <map>
@@ -8,15 +8,13 @@
 
 using namespace std;
 
-// Forward declarations
-struct SDL_Renderer;
-typedef struct TTF_Font TTF_Font;
-
 class Player {
 public:
-    Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont);
+    // Constructor sạch
+    Player();
     ~Player();
-    void renderRack(int mouseX, int mouseY);
+
+    // Các hàm Logic thuần túy (TEST ĐƯỢC)
     void refillRack();
     void resetRack(); 
     
@@ -28,17 +26,19 @@ public:
     int getScore() const { return score; }
     void addScore(int points) { score += points; }
     int getLives() const { return lives; } 
+    void decreaseLife() { if(lives > 0) lives--; }
+
+    // XÓA hàm renderRack()
 
 private:
     void initializeTileBag();
-    SDL_Renderer* renderer;
-    TTF_Font* font;
-    TTF_Font* smallFont;
+    
     int score;
     int lives; 
     vector<Tile*> rack;
     
+    // Logic túi bài
     vector<char> tileBag;
     map<char, int> tileValues;
 };
-#endif 
+#endif // PLAYER_H

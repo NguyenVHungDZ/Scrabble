@@ -1,26 +1,25 @@
-// -- src/Dictionary.cpp --
-#define SDL_MAIN_HANDLED
 #include "Dictionary.h"
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include <cctype>
 
-using namespace std;
-
-Dictionary::Dictionary(const string& path) {
-    ifstream file(path);
-    if (!file.is_open()) { 
-        cerr << "ERROR: Could not open dictionary file at " << path << endl;
-        return; 
+Dictionary::Dictionary(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        // Không in lỗi SDL, chỉ log ra console thường
+        std::cout << "Warning: Could not open dictionary at " << path << std::endl;
+        return;
     }
-    string word;
+    std::string word;
     while (file >> word) {
-        transform(word.begin(), word.end(), word.begin(),
-                       [](unsigned char c){ return toupper(c); });
+        // Chuyển về chữ hoa để so sánh chuẩn
+        std::transform(word.begin(), word.end(), word.begin(), ::toupper);
         wordList.insert(word);
     }
 }
-bool Dictionary::isValidWord(const string& word) const {
-    return wordList.count(word) > 0;
+
+bool Dictionary::isValidWord(const std::string& word) const {
+    std::string upperWord = word;
+    std::transform(upperWord.begin(), upperWord.end(), upperWord.begin(), ::toupper);
+    return wordList.find(upperWord) != wordList.end();
 }

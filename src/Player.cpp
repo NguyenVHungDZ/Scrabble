@@ -1,31 +1,35 @@
-// -- src/Player.cpp --
-#define SDL_MAIN_HANDLED
-#include <SDL.h>
-#include <SDL_ttf.h>
 #include "Player.h"
-#include "Constants.h"
+#include "Constants.h" // Đảm bảo có PLAYER_RACK_SIZE
 #include <random>
 #include <algorithm>
 #include <iostream>
 
-Player::Player(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* smallFont) 
-    : renderer(renderer), font(font), smallFont(smallFont), score(0), lives(3) { 
+// Constructor sạch: Khởi tạo điểm, mạng và túi bài
+Player::Player() : score(0), lives(3) { 
     initializeTileBag();
     rack.resize(PLAYER_RACK_SIZE, nullptr);
     refillRack();
 }
 
 Player::~Player() {
-    for (Tile* tile : rack) { delete tile; }
+    for (Tile* tile : rack) { 
+        if(tile) delete tile; 
+    }
     rack.clear();
 }
 
 void Player::refillRack() {
     for (int i = 0; i < PLAYER_RACK_SIZE; ++i) {
+        // Chỉ thêm gạch nếu ô đó trống và túi còn bài
         if (rack[i] == nullptr && !tileBag.empty()) {
             char letter = tileBag.back();
             tileBag.pop_back();
-            rack[i] = new Tile(letter, tileValues[letter], renderer, font, smallFont);
+            
+            // Lấy giá trị từ map
+            int value = tileValues[letter];
+            
+            // TẠO TILE MỚI (Không còn SDL renderer/font ở đây)
+            rack[i] = new Tile(letter, value);
             rack[i]->rackIndex = i;
         }
     }
@@ -33,34 +37,30 @@ void Player::refillRack() {
 
 void Player::resetRack() {
     if (lives <= 0) return; 
-    lives--; 
+    
+    lives--; // Trừ mạng (Logic game)
+    
+    // Trả lại bài vào túi (trừ quân bài trắng nếu muốn)
     for (size_t i = 0; i < rack.size(); ++i) {
         if (rack[i] != nullptr) {
-            if (rack[i]->getLetter() != ' ') {
-                 tileBag.push_back(rack[i]->getLetter());
-            }
+            // Logic cũ của bạn: trả lại túi
+            tileBag.push_back(rack[i]->getLetter());
+            
             delete rack[i];
             rack[i] = nullptr;
         }
     }
+    
+    // Xáo trộn túi
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(tileBag.begin(), tileBag.end(), g);
+    
+    // Bốc lại
     refillRack();
 }
 
-void Player::renderRack(int mouseX, int mouseY) {
-    SDL_Rect rackRect = { BOARD_X_OFFSET, RACK_Y_POS, BOARD_SIZE_PX, RACK_HEIGHT };
-    SDL_SetRenderDrawColor(renderer, COLOR_RACK_BG.r, COLOR_RACK_BG.g, COLOR_RACK_BG.b, COLOR_RACK_BG.a);
-    SDL_RenderFillRect(renderer, &rackRect);
-    int startX = BOARD_X_OFFSET + (BOARD_SIZE_PX - (PLAYER_RACK_SIZE * (TILE_SIZE + 5))) / 2;
-    int rackTileY = RACK_Y_POS + (RACK_HEIGHT - TILE_SIZE) / 2;
-    for (size_t i = 0; i < rack.size(); ++i) {
-        if (rack[i]) {
-            rack[i]->render(startX + i * (TILE_SIZE + 5), rackTileY, false, mouseX, mouseY);
-        }
-    }
-}
+// Hàm renderRack đã bị XÓA. Việc vẽ sẽ do Game.cpp thực hiện dựa trên dữ liệu rack.
 
 Tile* Player::getTileFromRack(int index) {
     if (index >= 0 && (size_t)index < rack.size()) return rack[index];
@@ -68,12 +68,17 @@ Tile* Player::getTileFromRack(int index) {
 }
 
 void Player::removeTileFromRack(int index) {
-    if (index >= 0 && (size_t)index < rack.size()) { rack[index] = nullptr; }
+    if (index >= 0 && (size_t)index < rack.size()) { 
+        // Lưu ý: Không delete tile ở đây, vì tile này đang được chuột kéo đi nơi khác
+        rack[index] = nullptr; 
+    }
 }
 
 void Player::returnTileToRack(Tile* tile) {
     if (tile && tile->rackIndex >= 0 && (size_t)tile->rackIndex < rack.size()) {
         rack[tile->rackIndex] = tile;
+        tile->boardRow = -1;
+        tile->boardCol = -1;
     }
 }
 
